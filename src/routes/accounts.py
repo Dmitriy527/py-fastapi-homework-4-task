@@ -6,7 +6,6 @@ from sqlalchemy import select, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from config import get_jwt_auth_manager, get_settings, BaseAppSettings, get_accounts_email_notificator
 from database import (
     get_db,
@@ -67,7 +66,7 @@ router = APIRouter()
 )
 async def register_user(
         user_data: UserRegistrationRequestSchema,
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(get_db)
 ) -> UserRegistrationResponseSchema:
     """
     Endpoint for user registration.
