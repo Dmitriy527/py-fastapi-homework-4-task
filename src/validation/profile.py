@@ -48,9 +48,9 @@ def validate_birth_date(birth_date: date) -> None:
 def validate_info(info: str) -> None:
     is_true_for_spase = False
     if info is None or info == "":
-        raise ValueError('Invalid info')
+        raise ValueError("Info field cannot be empty or contain only spaces.")
     for s in info:
         if s != " ":
             is_true_for_spase = True
     if is_true_for_spase is False:
-        raise ValueError('Invalid info')
+        raise ValueError("Info field cannot be empty or contain only spaces.")
