@@ -95,9 +95,15 @@ async def create_user_profile(
             detail="An error occurred while creating the profile.",
         )
 
-    new_profile_from_db_for_new_profile_model = await db.execute(select(UserProfileModel).where(
-        UserProfileModel.user_id == new_profile.user_id
-    ))
-    new_profile_from_db = new_profile_from_db_for_new_profile_model.scalar_one_or_none()
+    avatar_url = await s3_client.get_file_url(new_profile.avatar)
 
-    return ProfileResponseSchema.model_validate(new_profile_from_db)
+    return ProfileResponseSchema(
+        id=new_profile.id,
+        user_id=new_profile.user_id,
+        first_name=new_profile.first_name,
+        last_name=new_profile.last_name,
+        gender=new_profile.gender,
+        date_of_birth=new_profile.date_of_birth,
+        info=new_profile.info,
+        avatar=avatar_url,
+    )
