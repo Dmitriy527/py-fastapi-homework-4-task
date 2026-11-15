@@ -13,6 +13,7 @@ from fastapi import Header
 
 router = APIRouter()
 
+
 async def get_current_user(
         user_id: int,
         authorization: str | None = Header(default=None),
