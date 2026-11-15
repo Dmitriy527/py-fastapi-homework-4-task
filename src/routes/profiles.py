@@ -52,6 +52,8 @@ async def create_user_profile(
         s3_client: S3StorageInterface = Depends(get_s3_storage_client),
         profile_data: ProfileSchema = Depends(ProfileSchema.from_form),
 ):
+    if not current_user or not current_user.is_active:
+        raise HTTPException(401, "User not found or not active.")
     if not current_user.has_group(UserGroupEnum.ADMIN) and current_user.id != user_id:
         raise HTTPException(403, "You don't have permission to edit this profile.")
 

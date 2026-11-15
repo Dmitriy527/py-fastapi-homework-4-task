@@ -123,7 +123,7 @@ async def register_user(
 
         await db.commit()
         await db.refresh(new_user)
-        activation_link = f"{localhost}/accounts/login/"
+        activation_link = f"{localhost}/accounts/login/?token={activation_token}"
         background_tasks.add_task(
             email_sender.send_activation_email,
             str(user_data.email),
@@ -280,7 +280,7 @@ async def request_password_reset_token(
     reset_token = PasswordResetTokenModel(user_id=cast(int, user.id))
     db.add(reset_token)
     await db.commit()
-    activation_link = f"{localhost}/accounts/reset-password/complete/"
+    activation_link = f"{localhost}/accounts/reset-password/complete/?token={reset_token}&email={data.email}"
     background_tasks.add_task(
         email_sender.send_password_reset_email,
         str(data.email),
@@ -400,7 +400,7 @@ async def reset_password(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while resetting the password."
         )
-    activation_link = f"{localhost}/accounts/refresh/"
+    activation_link = f"{localhost}/accounts/login/"
     background_tasks.add_task(
         email_sender.send_password_reset_complete_email,
         str(data.email),
