@@ -67,7 +67,6 @@ async def create_user_profile(
 
     try:
         await s3_client.upload_file(file_name=avatar_key, file_data=avatar_bytes)
-        avatar_url = await s3_client.get_file_url(avatar_key)
     except S3FileUploadError as error:
         print(f"Error uploading avatar to S3: {error}")
         raise HTTPException(
@@ -82,7 +81,7 @@ async def create_user_profile(
         gender=profile_data.gender,
         date_of_birth=profile_data.date_of_birth,
         info=profile_data.info,
-        avatar=avatar_url,
+        avatar=avatar_key,
     )
 
     try:
