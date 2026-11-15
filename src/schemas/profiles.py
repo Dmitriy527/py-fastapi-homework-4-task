@@ -12,6 +12,7 @@ from validation import (
     validate_info
 )
 
+
 class ProfileSchema(BaseModel):
     first_name: str
     last_name: str
@@ -27,14 +28,12 @@ class ProfileSchema(BaseModel):
 
         return value.lower()
 
-
     @field_validator("gender", mode="before")
     @classmethod
     def validate_gender(cls, value):
         validate_gender(value)
 
         return value
-
 
     @field_validator("date_of_birth")
     @classmethod
@@ -43,14 +42,12 @@ class ProfileSchema(BaseModel):
 
         return value
 
-
     @field_validator("info")
     @classmethod
     def validate_info(cls, value):
         validate_info(value)
 
         return value
-
 
     @field_validator("avatar")
     @classmethod
@@ -80,7 +77,6 @@ class ProfileSchema(BaseModel):
             )
         except ValidationError as e:
             raise HTTPException(422, detail=e.__str__())
-
 
     class Config:
         arbitrary_types_allowed = True
