@@ -123,7 +123,7 @@ async def register_user(
 
         await db.commit()
         await db.refresh(new_user)
-        activation_link = f"{localhost}/accounts/login/?token={activation_token.token}"
+        activation_link = f"{localhost}/accounts/login/?token={activation_token.token}&email={user_data.email}"
         background_tasks.add_task(
             email_sender.send_activation_email,
             str(user_data.email),
