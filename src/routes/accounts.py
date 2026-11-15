@@ -19,7 +19,6 @@ from database import (
 )
 from exceptions import BaseSecurityError
 from notifications import EmailSenderInterface
-from routes.profiles import send_email_sendgrid
 from schemas import (
     UserRegistrationRequestSchema,
     UserRegistrationResponseSchema,
