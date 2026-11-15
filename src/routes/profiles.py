@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,6 @@ from storages import S3StorageInterface
 from fastapi import Header
 
 router = APIRouter()
-
 
 async def get_current_user(
         user_id: int,
@@ -52,8 +51,6 @@ async def create_user_profile(
         s3_client: S3StorageInterface = Depends(get_s3_storage_client),
         profile_data: ProfileSchema = Depends(ProfileSchema.from_form),
 ):
-    if not current_user or not current_user.is_active:
-        raise HTTPException(401, "User not found or not active.")
     if not current_user.has_group(UserGroupEnum.ADMIN) and current_user.id != user_id:
         raise HTTPException(403, "You don't have permission to edit this profile.")
 
@@ -69,6 +66,7 @@ async def create_user_profile(
 
     try:
         await s3_client.upload_file(file_name=avatar_key, file_data=avatar_bytes)
+        avatar_url = await s3_client.get_file_url(avatar_key)
     except S3FileUploadError as error:
         print(f"Error uploading avatar to S3: {error}")
         raise HTTPException(
