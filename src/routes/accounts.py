@@ -1,5 +1,7 @@
+import os
 from datetime import datetime, timezone
 from typing import cast
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, status, HTTPException, BackgroundTasks
 from sqlalchemy import select, delete
@@ -32,9 +34,11 @@ from schemas import (
     TokenRefreshResponseSchema
 )
 from security.interfaces import JWTAuthManagerInterface
+from dotenv import load_dotenv
 
+load_dotenv()
 router = APIRouter()
-localhost = "http://127.0.0.1"
+local_host = os.getenv("LOCAL_HOST")
 
 
 @router.post(
@@ -123,7 +127,11 @@ async def register_user(
 
         await db.commit()
         await db.refresh(new_user)
-        activation_link = f"{localhost}/accounts/login/?token={activation_token.token}&email={user_data.email}"
+        params = {
+            "token": activation_token.token,
+            "email": user_data.email,
+        }
+        activation_link = f"{local_host}/accounts/login/?{urlencode(params)}"
         background_tasks.add_task(
             email_sender.send_activation_email,
             str(user_data.email),
@@ -228,7 +236,7 @@ async def activate_account(
     user.is_active = True
     await db.delete(token_record)
     await db.commit()
-    activation_link = f"{localhost}/accounts/login/"
+    activation_link = f"{local_host}/accounts/login/"
     background_tasks.add_task(
         email_sender.send_activation_complete_email,
         str(activation_data.email),
@@ -280,7 +288,11 @@ async def request_password_reset_token(
     reset_token = PasswordResetTokenModel(user_id=cast(int, user.id))
     db.add(reset_token)
     await db.commit()
-    activation_link = f"{localhost}/accounts/reset-password/complete/?token={reset_token.token}&email={data.email}"
+    params = {
+        "token": reset_token.token,
+        "email": data.email,
+    }
+    activation_link = f"{local_host}/accounts/reset-password/complete/?{urlencode(params)}"
     background_tasks.add_task(
         email_sender.send_password_reset_email,
         str(data.email),
@@ -400,7 +412,7 @@ async def reset_password(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while resetting the password."
         )
-    activation_link = f"{localhost}/accounts/login/"
+    activation_link = f"{local_host}/accounts/login/"
     background_tasks.add_task(
         email_sender.send_password_reset_complete_email,
         str(data.email),
